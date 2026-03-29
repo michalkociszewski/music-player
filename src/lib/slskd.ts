@@ -121,7 +121,10 @@ async function pollUntilDownloaded(username: string, filename: string): Promise<
     for (const dir of data.directories ?? []) {
       const match = dir.files.find((f) => f.filename === filename);
       if (!match) continue;
-      if (match.state.includes("Succeeded")) return deriveLocalPath(filename);
+      if (match.state.includes("Succeeded")) {
+        const parts = filename.replace(/\\/g, "/").split("/");
+        return parts.slice(1).join("/");
+      }
       if (match.state.includes("Error") || match.state.includes("Cancelled")) {
         throw new Error(`Transfer failed: ${match.state}`);
       }
