@@ -7,8 +7,8 @@ import { useAudioStore } from "@/stores/audioStore";
 
 const AUDIO_EXT = new Set([".mp3", ".flac", ".ogg", ".m4a", ".aac", ".wav"]);
 
-function trackUrl(path: string) {
-  return `/api/audio?path=${encodeURIComponent(path)}`;
+function trackUrl(relativePath: string) {
+  return `/api/audio?path=${encodeURIComponent(relativePath)}`;
 }
 
 function ext(p: string) {

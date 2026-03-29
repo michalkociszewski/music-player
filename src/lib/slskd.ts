@@ -2,10 +2,10 @@ import os from "os";
 import path from "path";
 import type { SlskdSearchFile, SlskdSearchResponse, SlskdTransferFile } from "@/types";
 
-const SLSKD_BASE = "http://localhost:5030/api/v0";
+const SLSKD_BASE = (process.env.SLSKD_URL ?? "http://localhost:5030") + "/api/v0";
 const SLSKD_USER = process.env.SLSKD_USER ?? "slskd";
 const SLSKD_PASS = process.env.SLSKD_PASS ?? "slskd";
-const DOWNLOADS_DIR = path.join(os.homedir(), "Downloads", "slskd");
+export const DOWNLOADS_DIR = process.env.SLSKD_DOWNLOADS_DIR ?? path.join(os.homedir(), "Downloads", "slskd");
 
 const AUDIO_EXTENSIONS = new Set([".mp3", ".flac", ".ogg", ".m4a", ".aac"]);
 const POLL_INTERVAL_MS = 2000;
@@ -132,6 +132,32 @@ async function pollUntilDownloaded(username: string, filename: string): Promise<
 
 function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+// Returns relative paths (relative to DOWNLOADS_DIR) for all completed downloads
+export async function listCompletedDownloads(): Promise<string[]> {
+  const res = await fetch(`${SLSKD_BASE}/transfers/downloads`, {
+    headers: await headers(),
+  });
+  if (!res.ok) return [];
+
+  const users = (await res.json()) as Array<{
+    directories: Array<{ files: SlskdTransferFile[] }>;
+  }>;
+
+  const results: string[] = [];
+  for (const user of users) {
+    for (const dir of user.directories ?? []) {
+      for (const file of dir.files ?? []) {
+        if (!file.state?.includes("Succeeded")) continue;
+        const ext = file.filename.slice(file.filename.lastIndexOf(".")).toLowerCase();
+        if (!AUDIO_EXTENSIONS.has(ext)) continue;
+        const parts = file.filename.replace(/\\/g, "/").split("/");
+        results.push(parts.slice(1).join("/"));
+      }
+    }
+  }
+  return results;
 }
 
 export async function searchAndDownload(query: string): Promise<string> {
