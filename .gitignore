@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# slskd binary and config
+/slskd/
+
+# music scripts
+/music/
+
+# spec
+SPEC-internet-radio.md

@@ -23,7 +23,6 @@ export function Queue() {
   const tracks = useQueueStore((s) => s.tracks);
   const add = useQueueStore((s) => s.add);
   const remove = useQueueStore((s) => s.remove);
-  const requestPlay = useAudioStore((s) => s.requestPlay);
   const [input, setInput] = useState("");
 
   function submit() {
@@ -68,7 +67,7 @@ export function Queue() {
               </span>
               {track.status === "ready" && track.localPath && (
                 <button
-                  onClick={() => requestPlay(track.localPath!)}
+                  onClick={() => useAudioStore.getState().requestPlay(track.localPath!)}
                   className="text-white/40 hover:text-white transition-colors shrink-0"
                 >
                   <Play className="size-3.5 fill-current" />

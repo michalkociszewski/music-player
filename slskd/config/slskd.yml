@@ -1,6 +1,0 @@
-web:
-  port: 5030
-
-directories:
-  downloads: ~/Downloads/slskd
-  incomplete: ~/Downloads/slskd/incomplete
